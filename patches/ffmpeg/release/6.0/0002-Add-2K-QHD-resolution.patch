@@ -1,0 +1,12 @@
+diff --git a/libavutil/parseutils.c b/libavutil/parseutils.c
+index 59bec6c..e257648 100644
+--- a/libavutil/parseutils.c
++++ b/libavutil/parseutils.c
+@@ -115,6 +115,7 @@ static const VideoSizeAbbr video_size_abbrs[] = {
+     { "2kdci",    2048,1080 },
+     { "2kflat",   1998,1080 },
+     { "2kscope",  2048, 858 },
++    { "2kqhd",    2560,1440 },
+     { "4k",       4096,2160 }, /* Digital Cinema System Specification */
+     { "4kdci",    4096,2160 },
+     { "4kflat",   3996,2160 },
