@@ -4,6 +4,8 @@ SCRIPT_REPO="https://svn.xvid.org/trunk/xvidcore"
 SCRIPT_REV="2202"
 
 ffbuild_enabled() {
+    # Temporarily disabled due to SVN server issues (503 Service Unavailable)
+    return -1
     [[ $VARIANT == lgpl* ]] && return -1
     return 0
 }
