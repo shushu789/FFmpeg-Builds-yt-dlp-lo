@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/delthas/xvid.git"
-SCRIPT_COMMIT="main"
+SCRIPT_COMMIT="master"
 
 ffbuild_enabled() {
     [[ $VARIANT == lgpl* ]] && return -1
