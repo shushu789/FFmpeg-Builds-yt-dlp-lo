@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Builder <builder@localhost>
+Date: Wed, 27 Jun 2025 12:00:00 +0000
+Subject: [PATCH] Enhanced FLV HEVC/AV1 support
+
+Add support for HEVC (codec_id=12) and AV1 (codec_id=13) in FLV format
+
+diff --git a/libavformat/flv.h b/libavformat/flv.h
+index 3571b90279..22faf26a42 100644
+--- a/libavformat/flv.h
++++ b/libavformat/flv.h
+@@ -110,6 +110,8 @@ enum {
+     FLV_CODECID_REALH263= 8,
+     FLV_CODECID_MPEG4   = 9,
++    FLV_CODECID_HEVC    = 12,
++    FLV_CODECID_AV1     = 13,
+ };
+ 
+ enum {
+diff --git a/libavformat/flvdec.c b/libavformat/flvdec.c
+index 79c810f963..dee7499057 100644
+--- a/libavformat/flvdec.c
++++ b/libavformat/flvdec.c
+@@ -320,6 +320,10 @@ static int flv_same_video_codec(AVCodecParameters *vpar, int flags)
+         return vpar->codec_id == AV_CODEC_ID_VP6A;
+     case FLV_CODECID_H264:
+         return vpar->codec_id == AV_CODEC_ID_H264;
++    case FLV_CODECID_HEVC:
++        return vpar->codec_id == AV_CODEC_ID_HEVC;
++    case FLV_CODECID_AV1:
++        return vpar->codec_id == AV_CODEC_ID_AV1;
+     default:
+         return vpar->codec_tag == flv_codecid;
+     }
+@@ -369,6 +373,16 @@ static int flv_set_video_codec(AVFormatContext *s, AVStream *vstream,
+         par->codec_id = AV_CODEC_ID_MPEG4;
+         ret = 3;
+         break;
++    case FLV_CODECID_HEVC:
++        par->codec_id = AV_CODEC_ID_HEVC;
++        vstreami->need_parsing = AVSTREAM_PARSE_HEADERS;
++        ret = 3;    // not 4, reading packet type will consume one byte
++        break;
++    case FLV_CODECID_AV1:
++        par->codec_id = AV_CODEC_ID_AV1;
++        vstreami->need_parsing = AVSTREAM_PARSE_HEADERS;
++        ret = 3;
++        break;
+     default:
+         avpriv_request_sample(s, "Video codec (%x)", flv_codecid);
+         par->codec_tag = flv_codecid;
+@@ -1241,7 +1255,9 @@ retry_duration:
+
+     if (st->codecpar->codec_id == AV_CODEC_ID_AAC ||
+         st->codecpar->codec_id == AV_CODEC_ID_H264 ||
+-        st->codecpar->codec_id == AV_CODEC_ID_MPEG4) {
++        st->codecpar->codec_id == AV_CODEC_ID_MPEG4 ||
++        st->codecpar->codec_id == AV_CODEC_ID_HEVC ||
++        st->codecpar->codec_id == AV_CODEC_ID_AV1) {
+         int type = avio_r8(s->pb);
+         size--;
+ 
+@@ -1250,7 +1266,8 @@ retry_duration:
+             goto leave;
+         }
+ 
+-        if (st->codecpar->codec_id == AV_CODEC_ID_H264 || st->codecpar->codec_id == AV_CODEC_ID_MPEG4) {
++        if (st->codecpar->codec_id == AV_CODEC_ID_H264 || st->codecpar->codec_id == AV_CODEC_ID_MPEG4
++                || st->codecpar->codec_id == AV_CODEC_ID_HEVC || st->codecpar->codec_id == AV_CODEC_ID_AV1) {
+             // sign extension
+             int32_t cts = (avio_rb24(s->pb) + 0xff800000) ^ 0xff800000;
+             pts = av_sat_add64(dts, cts);
+@@ -1266,7 +1283,9 @@ retry_duration:
+             }
+         }
+         if (type == 0 && (!st->codecpar->extradata || st->codecpar->codec_id == AV_CODEC_ID_AAC ||
+-            st->codecpar->codec_id == AV_CODEC_ID_H264)) {
++            st->codecpar->codec_id == AV_CODEC_ID_H264 || st->codecpar->codec_id == AV_CODEC_ID_HEVC ||
++            st->codecpar->codec_id == AV_CODEC_ID_AV1)) {
+             AVDictionaryEntry *t;
+
+             if (st->codecpar->extradata) {
+diff --git a/libavformat/flvenc.c b/libavformat/flvenc.c
+index 35bf7ace5e..7a9c35f513 100644
+--- a/libavformat/flvenc.c
++++ b/libavformat/flvenc.c
+@@ -27,6 +27,8 @@
+ #include "avio_internal.h"
+ #include "avio.h"
+ #include "avc.h"
++#include "hevc.h"
++#include "av1.h"
+ #include "avformat.h"
+ #include "flv.h"
+ #include "internal.h"
+@@ -46,6 +48,8 @@ static const AVCodecTag flv_video_codec_ids[] = {
+     { AV_CODEC_ID_VP6,      FLV_CODECID_VP6 },
+     { AV_CODEC_ID_VP6A,     FLV_CODECID_VP6A },
+     { AV_CODEC_ID_H264,     FLV_CODECID_H264 },
++    { AV_CODEC_ID_HEVC,     FLV_CODECID_HEVC },
++    { AV_CODEC_ID_AV1,      FLV_CODECID_AV1  },
+     { AV_CODEC_ID_NONE,     0 }
+ };
+ 
+@@ -394,7 +400,7 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
+                 return AVERROR(EINVAL);
+             }
+         }
+-    } else if (par->codec_id == AV_CODEC_ID_H264) {
++    } else if (par->codec_id == AV_CODEC_ID_H264 || par->codec_id == AV_CODEC_ID_HEVC || par->codec_id == AV_CODEC_ID_AV1) {
+         int64_t cur_offset = avio_tell(pb);
+         if (pkt->pts == AV_NOPTS_VALUE) {
+             av_log(s, AV_LOG_ERROR, "Packet is missing PTS\n");
+diff --git a/libavformat/av1.c b/libavformat/av1.c
+index 5512c4e0f7..bf41b0e9e3 100644
+--- a/libavformat/av1.c
++++ b/libavformat/av1.c
+@@ -1,3 +1,4 @@
++// Enhanced AV1 support for FLV format
+ /*
+  * AV1 helper functions for muxers
+  * Copyright (c) 2018 James Almer <jamrial@gmail.com>
+-- 
+2.34.1

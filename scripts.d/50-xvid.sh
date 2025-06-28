@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT_REPO="https://svn.xvid.org/trunk/xvidcore"
-SCRIPT_REV="2202"
+SCRIPT_REPO="https://github.com/delthas/xvid.git"
+SCRIPT_COMMIT="master"
 
 ffbuild_enabled() {
     [[ $VARIANT == lgpl* ]] && return -1
@@ -9,11 +9,11 @@ ffbuild_enabled() {
 }
 
 ffbuild_dockerdl() {
-    echo "retry-tool sh -c \"rm -rf xvid && svn --non-interactive checkout --username 'anonymous' --password '' '${SCRIPT_REPO}@${SCRIPT_REV}' xvid\" && cd xvid"
+    echo "retry-tool sh -c \"rm -rf xvid && git clone '${SCRIPT_REPO}' xvid\" && cd xvid && git checkout '${SCRIPT_COMMIT}'"
 }
 
 ffbuild_dockerbuild() {
-    cd build/generic
+    cd xvidcore/build/generic
 
     # The original code fails on a two-digit major...
     sed -i\

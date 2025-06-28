@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: t3etx-norvs
+created: 2025-06-27T14:42:15+08:00

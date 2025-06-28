@@ -16,10 +16,14 @@ on:
         default: false
         required: false
   schedule:
-    - cron: '42 13 * * *'
+    - cron: '15 12 * * *'
 
 env:
   DOCKER_BUILDKIT: 1
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   pre_check:

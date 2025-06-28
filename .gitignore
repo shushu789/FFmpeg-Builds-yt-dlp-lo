@@ -7,4 +7,8 @@
 /artifacts/
 /.cache/
 .DS_Store
+<<<<<<< HEAD
 .stfolder/syncthing-folder-144df5.txt
+=======
+temp.md
+>>>>>>> 59f8843991c8d87eabd9ba873c79c8e23fdea16a

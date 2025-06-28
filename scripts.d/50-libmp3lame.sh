@@ -1,14 +1,14 @@
 #!/bin/bash
 
-SCRIPT_REPO="https://svn.code.sf.net/p/lame/svn/trunk/lame"
-SCRIPT_REV="6531"
+SCRIPT_REPO="https://github.com/lameproject/lame.git"
+SCRIPT_COMMIT="master"
 
 ffbuild_enabled() {
     return 0
 }
 
 ffbuild_dockerdl() {
-    echo "retry-tool sh -c \"rm -rf lame && svn checkout '${SCRIPT_REPO}@${SCRIPT_REV}' lame\" && cd lame"
+    echo "retry-tool sh -c \"rm -rf lame && git clone '${SCRIPT_REPO}' lame\" && cd lame && git checkout '${SCRIPT_COMMIT}'"
 }
 
 ffbuild_dockerbuild() {
