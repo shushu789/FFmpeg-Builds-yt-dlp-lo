@@ -6,3 +6,5 @@
 /ffbuild/
 /artifacts/
 /.cache/
+.DS_Store
+.stfolder/syncthing-folder-144df5.txt
