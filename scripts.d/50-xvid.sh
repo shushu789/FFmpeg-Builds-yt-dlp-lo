@@ -13,7 +13,7 @@ ffbuild_dockerdl() {
 }
 
 ffbuild_dockerbuild() {
-    cd build/generic
+    cd xvidcore/build/generic
 
     # The original code fails on a two-digit major...
     sed -i\
