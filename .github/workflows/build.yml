@@ -15,8 +15,6 @@ on:
         type: boolean
         default: false
         required: false
-  schedule:
-    - cron: '15 12 * * *'
 
 env:
   DOCKER_BUILDKIT: 1
@@ -276,7 +274,7 @@ jobs:
           path: artifacts/*
   publish_release:
     name: Publish release
-    if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' || github.event_name == 'push' ) && needs.build_ffmpeg.result == 'success' }}
+    if: ${{ !cancelled() && ( github.event.inputs.doRelease == 'true' || github.event_name == 'push' ) && needs.build_ffmpeg.result == 'success' }}
     needs: build_ffmpeg
     runs-on: ubuntu-latest
     steps:
