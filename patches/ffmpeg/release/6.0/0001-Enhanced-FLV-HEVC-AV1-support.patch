@@ -1,10 +1,3 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Builder <builder@localhost>
-Date: Wed, 27 Jun 2025 12:00:00 +0000
-Subject: [PATCH] Enhanced FLV HEVC/AV1 support
-
-Add support for HEVC (codec_id=12) and AV1 (codec_id=13) in FLV format
-
 diff --git a/libavformat/flv.h b/libavformat/flv.h
 index 3571b90279..22faf26a42 100644
 --- a/libavformat/flv.h
@@ -57,7 +50,7 @@ index 79c810f963..dee7499057 100644
 +            st->codecpar->codec_id == AV_CODEC_ID_H264 || st->codecpar->codec_id == AV_CODEC_ID_HEVC ||
 +            st->codecpar->codec_id == AV_CODEC_ID_AV1)) {
              AVDictionaryEntry *t;
-
+ 
              if (st->codecpar->extradata) {
 diff --git a/libavformat/flvenc.c b/libavformat/flvenc.c
 index 35bf7ace5e..7a9c35f513 100644
@@ -92,14 +85,3 @@ index 35bf7ace5e..7a9c35f513 100644
          int64_t cur_offset = avio_tell(pb);
          if (pkt->pts == AV_NOPTS_VALUE) {
              av_log(s, AV_LOG_ERROR, "Packet is missing PTS\n");
-diff --git a/libavformat/av1.c b/libavformat/av1.c
-index 81f9b7d123..7f1234abcd 100644
---- a/libavformat/av1.c
-+++ b/libavformat/av1.c
-@@ -1,3 +1,4 @@
-+// Enhanced AV1 support for FLV format
- /*
-  * AV1 helper functions for muxers
-  * Copyright (c) 2018 James Almer <jamrial@gmail.com>
--- 
-2.34.1
