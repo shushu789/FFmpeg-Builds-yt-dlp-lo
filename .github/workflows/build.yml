@@ -1,6 +1,8 @@
 name: Build FFmpeg
 
 on:
+  push:
+    branches: [ master ]
   workflow_dispatch:
     inputs:
       doRelease:
