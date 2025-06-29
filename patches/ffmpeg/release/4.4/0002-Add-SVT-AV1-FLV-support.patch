@@ -32,7 +32,8 @@ index 91f006520c..22faf26a42 100644
 @@ -111,6 +111,7 @@ enum {
      FLV_CODECID_REALH263= 8,
      FLV_CODECID_MPEG4   = 9,
-     FLV_CODECID_HEVC    = 13,
+     FLV_CODECID_HEVC    = 12,
++    FLV_CODECID_HEVC_FQ = 13,
 +    FLV_CODECID_AV1     = 14,
  };
  
