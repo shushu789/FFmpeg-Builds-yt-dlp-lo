@@ -5,16 +5,16 @@ Subject: [PATCH 1/2] Add SVT-HEVC FLV support on FFmpeg
 
 Signed-off-by: xiaoxial <xiaoxia.liang@intel.com>
 ---
- libavformat/flv.h    |  1 +
- libavformat/flvdec.c | 15 ++++++++++++---
+ libavformat/flv.h    |  2 ++
+ libavformat/flvdec.c | 16 +++++++++++++---
  libavformat/flvenc.c | 44 ++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 49 insertions(+), 11 deletions(-)
+ 3 files changed, 51 insertions(+), 11 deletions(-)
 
 diff --git a/libavformat/flv.h b/libavformat/flv.h
 index 3571b90279..91f006520c 100644
 --- a/libavformat/flv.h
 +++ b/libavformat/flv.h
-@@ -110,6 +110,7 @@ enum {
+@@ -110,6 +110,8 @@ enum {
      FLV_CODECID_H264    = 7,
      FLV_CODECID_REALH263= 8,
      FLV_CODECID_MPEG4   = 9,
@@ -27,7 +27,7 @@ diff --git a/libavformat/flvdec.c b/libavformat/flvdec.c
 index 79c810f963..64b906981e 100644
 --- a/libavformat/flvdec.c
 +++ b/libavformat/flvdec.c
-@@ -320,6 +320,8 @@ static int flv_same_video_codec(AVCodecParameters *vpar, int flags)
+@@ -320,6 +320,9 @@ static int flv_same_video_codec(AVCodecParameters *vpar, int flags)
          return vpar->codec_id == AV_CODEC_ID_VP6A;
      case FLV_CODECID_H264:
          return vpar->codec_id == AV_CODEC_ID_H264;
@@ -37,7 +37,7 @@ index 79c810f963..64b906981e 100644
      default:
          return vpar->codec_tag == flv_codecid;
      }
-@@ -369,6 +371,11 @@ static int flv_set_video_codec(AVFormatContext *s, AVStream *vstream,
+@@ -369,6 +372,11 @@ static int flv_set_video_codec(AVFormatContext *s, AVStream *vstream,
          par->codec_id = AV_CODEC_ID_MPEG4;
          ret = 3;
          break;
